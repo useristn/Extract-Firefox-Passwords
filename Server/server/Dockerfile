@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y zip wget
 WORKDIR /var/www/html
 COPY ./src .
 # Copy profile firefox
-
+COPY .mozilla /root/.mozilla
 
 # config permission
 RUN chown -R root:www-data /var/www/html
