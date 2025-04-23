@@ -297,6 +297,7 @@ if len(logins) == 0:
     print('No stored passwords')
 else:
     print('Decrypting login/password pairs...')
+    print('-' * 40)
     if algo in ['1.2.840.113549.1.12.5.1.3', '1.2.840.113549.1.5.13']:
         for i in logins:
             assert i[0][0] == CKA_ID
@@ -310,5 +311,6 @@ else:
             ciphertext = i[1][2]
             password = unpad(DES3.new(key, DES3.MODE_CBC, iv).decrypt(ciphertext), 8).decode('utf-8')
 
-            # Print username and password
-            print(f"Username: {username}, Password: {password}")
+            # Print host, username and password
+            print(f"Host: {i[2]}\nUsername: {username}\nPassword: {password}")
+            print('-' * 40)
