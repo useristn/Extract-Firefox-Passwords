@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  server:
+    build: ./server
+    container_name: 'server'
+    restart: 'unless-stopped'
+    ports:
+      - "10000:80"
+    volumes: 
+      - ./server/src/:/var/www/html/
+networks:
+  internet: {}
+  no-internet:
+    internal: true
