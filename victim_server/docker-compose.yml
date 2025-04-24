@@ -1,14 +1,22 @@
 version: "3"
 
 services:
-  server:
-    build: ./server
-    container_name: 'server'
+  firefox-non-password:
+    build: ./firefox_non_password
+    container_name: 'firefox_non_password'
     restart: 'unless-stopped'
     ports:
       - "3000:80"
     volumes: 
-      - ./server/src/:/var/www/html/
+      - ./firefox_non_password/src/:/var/www/html/
+  firefox-primary-password:
+    build: ./firefox_primary_password
+    container_name: 'firefox_primary_password'
+    restart: 'unless-stopped'
+    ports:
+      - "3001:80"
+    volumes: 
+      - ./firefox_primary_password/src/:/var/www/html/
 networks:
   internet: {}
   no-internet:
