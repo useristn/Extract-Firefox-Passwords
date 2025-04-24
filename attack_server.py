@@ -41,7 +41,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
         # Bước 3: Chạy decrypt.py
         # Run: python decrypt.py -d ./extracted_files/profile
         process = subprocess.run(
-            ["python", 'decrypt_tool.py', "-d", extract_path],
+            ["python", 'decryption.py', "-d", extract_path],
             capture_output=True,
             text=True
         )
