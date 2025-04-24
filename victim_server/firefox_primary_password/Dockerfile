@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install inetutils-ping dnsutils -y
 
 WORKDIR /var/www/html
 COPY ./src .
-COPY .mozilla /root/.mozilla
+COPY ./.mozilla /root/.mozilla
 
 RUN chown -R root:www-data /var/www/html
 RUN chmod +t -R /var/www/html/
