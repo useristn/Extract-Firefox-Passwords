@@ -1,16 +1,16 @@
 from struct import unpack
-import sys
 from binascii import hexlify, unhexlify
+import sys
+import json
 import sqlite3
+import hmac
 from base64 import b64decode
 from pyasn1.codec.der import decoder
 from hashlib import sha1, pbkdf2_hmac
-import hmac
 from Crypto.Cipher import DES3, AES
 from Crypto.Util.number import long_to_bytes
 from Crypto.Util.Padding import unpad
 from optparse import OptionParser
-import json
 from pathlib import Path
 from tabulate import tabulate
 

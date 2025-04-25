@@ -15,7 +15,7 @@ if (isset($_POST['command'], $_POST['target'])) {
         default:
             $output = "❌ Invalid command.";
     }
-    echo htmlspecialchars($output);
+    echo $output;
     exit;
 }
 ?>
