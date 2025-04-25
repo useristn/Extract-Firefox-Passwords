@@ -1,0 +1,4 @@
+# Ignore result folders
+exploitation_result/
+extracted_files/
+received_files/
