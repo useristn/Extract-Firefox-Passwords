@@ -1,15 +1,15 @@
-from struct import unpack
-from binascii import hexlify, unhexlify
 import sys
 import json
 import sqlite3
+from struct import unpack
+from binascii import hexlify, unhexlify
 import hmac
-from base64 import b64decode
-from pyasn1.codec.der import decoder
-from hashlib import sha1, pbkdf2_hmac
 from Crypto.Cipher import DES3, AES
 from Crypto.Util.number import long_to_bytes
 from Crypto.Util.Padding import unpad
+from hashlib import sha1, pbkdf2_hmac
+from pyasn1.codec.der import decoder
+from base64 import b64decode
 from optparse import OptionParser
 from pathlib import Path
 from tabulate import tabulate
@@ -159,7 +159,7 @@ def readBsddb(name):
             print('%s: %s' % (repr(i), hexlify(db[i])))
     return db
 
-# Hàm trích xuất khóa bí mật từ key3.db
+# Hàm trích xuất khóa bí mật từ key4.db
 def extractSecretKey(masterPassword, keyData):
     pwdCheck = keyData[b'password-check']
     entrySaltLen = pwdCheck[1]
@@ -207,7 +207,7 @@ def decryptPBE(decodedItem, masterPassword, globalSalt):
         clearText = AES.new(key, AES.MODE_CBC, iv).decrypt(cipherT)
         return clearText, pbeAlgo
 
-# Hàm lấy khóa giải mã từ key4.db hoặc key3.db
+# Hàm lấy khóa giải mã từ key4.db
 def getKey(masterPassword, directory):
     if (directory / 'key4.db').exists():
         conn = sqlite3.connect(directory / 'key4.db')
@@ -238,7 +238,7 @@ def getKey(masterPassword, directory):
         key = extractSecretKey(masterPassword, keyData)
         return key, '1.2.840.113549.1.12.5.1.3'
     else:
-        print('Cannot find key4.db or key3.db')
+        print('Can not find key4.db')
         return None, None
 
 # Hàm lấy dữ liệu đăng nhập từ logins.json hoặc signons.sqlite
@@ -271,10 +271,9 @@ def getLoginData():
 
 CKA_ID = unhexlify('f8000000000000000000000000000001')
 
-# Chương trình chính
 parser = OptionParser(usage="Usage: python %prog [options]")
-parser.add_option("-d", "--dir", type="string", dest="directory", default='')
-parser.add_option("-p", "--password", type="string", dest="masterPassword", default='')
+parser.add_option("-d", "--dir", type="string", dest="directory",help="Path to Firefox profile directory", default='')
+parser.add_option("-p", "--password", type="string", dest="masterPassword", help="Primary Password",default='')
 (options, args) = parser.parse_args()
 options.directory = Path(options.directory)
 

