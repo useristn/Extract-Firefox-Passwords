@@ -71,10 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['command'], $_POST['ta
     echo htmlspecialchars($output, ENT_QUOTES, 'UTF-8');
     exit;
 }
-
-// Nếu không phải POST hoặc thiếu tham số
-http_response_code(400);
-echo htmlspecialchars("❌ Invalid request.");
 ?>
 
 <!DOCTYPE html>
