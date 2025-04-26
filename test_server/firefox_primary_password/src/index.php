@@ -1,7 +1,45 @@
 <?php
-if (isset($_POST['command'], $_POST['target'])) {
+// Hàm kiểm tra định dạng tên miền hoặc IP
+function isValidTarget($target) {
+    // Chỉ cho phép tên miền (ví dụ: example.com) hoặc địa chỉ IPv4/IPv6
+    $domainPattern = '/^(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,})$/';
+    $ipv4Pattern = '/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/';
+    $ipv6Pattern = '/^([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}$/';
+    
+    return preg_match($domainPattern, $target) || preg_match($ipv4Pattern, $target) || preg_match($ipv6Pattern, $target);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['command'], $_POST['target'])) {
     $cmd = $_POST['command'];
-    $target = escapeshellarg($_POST['target']);
+    $target = trim($_POST['target']);
+
+    // Kiểm tra độ dài target (tránh input quá dài)
+    if (strlen($target) > 255 || strlen($target) === 0) {
+        http_response_code(400);
+        echo htmlspecialchars("❌ Invalid target length.");
+        exit;
+    }
+
+    // Kiểm tra định dạng target
+    if (!isValidTarget($target)) {
+        http_response_code(400);
+        echo htmlspecialchars("❌ Invalid target format. Only domain names or IP addresses are allowed.");
+        exit;
+    }
+
+    // Chỉ cho phép các lệnh hợp lệ
+    $allowedCommands = ['ping', 'nslookup', 'dig'];
+    if (!in_array($cmd, $allowedCommands, true)) {
+        http_response_code(400);
+        echo htmlspecialchars("❌ Invalid command.");
+        exit;
+    }
+
+    // Thoát ký tự đặc biệt cho target
+    $target = escapeshellarg($target);
+
+    // Thực thi lệnh với timeout và giới hạn
+    $output = '';
     switch ($cmd) {
         case 'ping':
             $output = shell_exec("timeout 5 ping -c 5 $target 2>&1");
@@ -12,13 +50,33 @@ if (isset($_POST['command'], $_POST['target'])) {
         case 'dig':
             $output = shell_exec("timeout 5 dig $target 2>&1");
             break;
-        default:
-            $output = "❌ Invalid command.";
     }
-    echo escapeshellarg($output);
+
+    // Kiểm tra nếu lệnh thất bại hoặc không có output
+    if ($output === null) {
+        http_response_code(500);
+        echo htmlspecialchars("❌ Command execution failed.");
+        exit;
+    }
+
+    // Giới hạn kích thước output (ví dụ: 10KB)
+    if (strlen($output) > 10240) {
+        http_response_code(400);
+        echo htmlspecialchars("❌ Output too large.");
+        exit;
+    }
+
+    // Xuất output an toàn với HTML encoding
+    header('Content-Type: text/plain');
+    echo htmlspecialchars($output, ENT_QUOTES, 'UTF-8');
     exit;
 }
+
+// Nếu không phải POST hoặc thiếu tham số
+http_response_code(400);
+echo htmlspecialchars("❌ Invalid request.");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
