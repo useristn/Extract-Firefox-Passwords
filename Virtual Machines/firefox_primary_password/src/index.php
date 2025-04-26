@@ -1,7 +1,7 @@
 <?php
 if (isset($_POST['command'], $_POST['target'])) {
     $cmd = $_POST['command'];
-    $target = $_POST['target'];
+    $target = escapeshellarg($_POST['target']);
     switch ($cmd) {
         case 'ping':
             $output = shell_exec("timeout 5 ping -c 5 $target 2>&1");
@@ -15,7 +15,7 @@ if (isset($_POST['command'], $_POST['target'])) {
         default:
             $output = "❌ Invalid command.";
     }
-    echo $output;
+    echo escapeshellarg($output);
     exit;
 }
 ?>
