@@ -1,4 +1,3 @@
-tabulate
-tqdm
-pyasn1
-pycryptodome
+version https://git-lfs.github.com/spec/v1
+oid sha256:2ddfe4c401453bf5dbb80db234759dca1e0e34cb2868fd8f0f85c23ab0bcdfb9
+size 36
