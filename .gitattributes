@@ -1,4 +1,1 @@
-* text=auto eol=lf
-*.txt binary
-numeric_*.txt linguist-documentation
-common_passwords.txt linguist-documentation
+* text=auto
