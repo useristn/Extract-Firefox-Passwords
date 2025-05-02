@@ -3,14 +3,15 @@ import json, sqlite3, argparse
 from hashlib import sha1, pbkdf2_hmac
 from binascii import unhexlify
 from base64 import b64decode
+from datetime import datetime
 from pathlib import Path
+
 # Third-party
 from Crypto.Cipher import DES3, AES
 from Crypto.Util.Padding import unpad
 from pyasn1.codec.der import decoder
 from tabulate import tabulate
 from tqdm import tqdm
-
 
 # ========== Hàm xử lý lỗi ==========
 def safe_open(path, mode='r', encoding='utf-8'):
@@ -126,19 +127,25 @@ def decrypt_saved_logins(profile_dir: Path, primary_password: str):
         return False
 
     table_data = []
-    for user_entry, pass_entry, hostname in logins:
-        if user_entry[0] != CKA_ID:
-            continue
-        try:
-            username = unpad(DES3.new(key, DES3.MODE_CBC, user_entry[1]).decrypt(user_entry[2]), 8).decode("utf-8")
-            password = unpad(DES3.new(key, DES3.MODE_CBC, pass_entry[1]).decrypt(pass_entry[2]), 8).decode("utf-8")
-            table_data.append([hostname, username, password])
-        except Exception as e:
-            print(f"Decryption failed for {hostname}: {e}")
+    log_file = Path("Logs/logs.txt")
+    log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    if table_data:
-        tqdm.write(tabulate(table_data, headers=["Hostname", "Username", "Password"], tablefmt="grid"))
-        return True
+    with open(log_file, "a", encoding="utf-8") as log:
+        for user_entry, pass_entry, hostname in logins:
+            if user_entry[0] != CKA_ID:
+                continue
+            try:
+                username = unpad(DES3.new(key, DES3.MODE_CBC, user_entry[1]).decrypt(user_entry[2]), 8).decode("utf-8")
+                password = unpad(DES3.new(key, DES3.MODE_CBC, pass_entry[1]).decrypt(pass_entry[2]), 8).decode("utf-8")
+                table_data.append([hostname, username, password])
+            except Exception as e:
+                print(f"Decryption failed for {hostname}: {e}")
+
+        if table_data:
+            result = tabulate(table_data, headers=["Hostname", "Username", "Password"], tablefmt="grid")
+            tqdm.write(result)
+            log.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]\n{result}\n\n")
+            return True
 
     return False
 
