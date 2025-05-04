@@ -161,6 +161,8 @@ def brute_force_primary_password(profile_dir: Path, wordlist_path: Path):
     for password in tqdm(passwords, desc="Brute-force", ncols=77, leave=False, bar_format="{l_bar}{bar}   |   [{n_fmt}/{total_fmt}] [{elapsed} - {remaining}]"):
         if decrypt_saved_logins(profile_dir, password):
             tqdm.write(f"Success! Primary password is: {password}")
+            with open("Logs/logs.txt", "a", encoding="utf-8") as log:
+                log.write(f"Success! Primary password is: {password}\n\n")
             return True
 
     print("Failed to find valid primary password.")
