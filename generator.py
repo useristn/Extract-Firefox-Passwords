@@ -74,7 +74,7 @@ def generate_wordlist(name, birthdate, filename="./Wordlists/custom_passwords.tx
                 print("Invalid birthdate format. Using only name and keywords.")
 
         if keywords is None:
-            keywords = ["123", "admin", "love", "password", "cute", "pro"]
+            keywords = ["123", "123456", "admin", "password", "secret", "qwerty", "abc", "xyz", "iloveyou", "love", "cute", "pro"]
 
         name_combos = set()
 
