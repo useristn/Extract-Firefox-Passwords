@@ -70,6 +70,11 @@ def generate_wordlist(name, birthdate, filename="./Wordlists/custom_passwords.tx
             try:
                 day, month, year = map(int, birthdate.strip().split("/"))
                 date_parts = generate_date_formats(day, month, year)
+                dd = str(day).zfill(2)
+                mm = str(month).zfill(2)
+                yy = str(year)[2:]
+                yyyy = str(year)
+
             except ValueError:
                 print("Invalid birthdate format. Using only name and keywords.")
 
@@ -105,6 +110,10 @@ def generate_wordlist(name, birthdate, filename="./Wordlists/custom_passwords.tx
                     name + "_" + date,
                     name.capitalize() + date
                 ]
+                variations += [
+                name + yy,
+                name + dd + mm
+                ]
                 if enable_leet:
                     variations.extend(leet_variants(name + date))
                 all_lines.update(variations)
@@ -118,6 +127,20 @@ def generate_wordlist(name, birthdate, filename="./Wordlists/custom_passwords.tx
                         kw + name + date,
                         name + "_" + kw,
                         name + "@" + kw
+                    ])
+
+            # Nếu không có ngày sinh, chỉ tạo tổ hợp tên và từ khóa
+            if name_combos and birthdate:
+                for name in name_combos:
+                    all_lines.update([
+                        name + yyyy,
+                        name + dd + mm
+                    ])
+            else:
+                for name in name_combos:
+                    all_lines.update([
+                        name,
+                        name.capitalize()
                     ])
 
         # Tổ hợp chỉ tên
