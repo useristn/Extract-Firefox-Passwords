@@ -169,19 +169,41 @@ def brute_force_primary_password(profile_dir: Path, wordlist_path: Path):
     return False
 
 
+# ========== Tìm profile Firefox trên Windows ==========
+def find_default_release_profile():
+    profiles_dir = Path.home() / "AppData" / "Roaming" / "Mozilla" / "Firefox" / "Profiles"
+    if not profiles_dir.exists():
+        print("Firefox profiles directory not found.")
+        return None
+
+    # Tìm thư mục có hậu tố .default-release
+    for profile in profiles_dir.iterdir():
+        if profile.is_dir() and profile.name.endswith(".default-release"):
+            return profile
+
+    print("No default release profile found.")
+    return None
+
+
 # ========== Entry Point ==========
 def main():
     parser = argparse.ArgumentParser(description="Firefox Passwords Extractor")
-    parser.add_argument("-d", "--dir", required=True, help="Path to Firefox profile directory")
+    parser.add_argument("-d", "--dir", help="Path to Firefox profile directory")
     parser.add_argument("-p", "--password", help="Primary password for decryption")
     parser.add_argument("-f", "--fuzzing", help="Path to password wordlist for brute-force")
 
     args = parser.parse_args()
-    profile_dir = Path(args.dir)
 
-    if not profile_dir.exists() or not profile_dir.is_dir():
-        print("Provided profile path is invalid.")
-        return
+    if args.dir:
+        profile_dir = Path(args.dir)
+        if not profile_dir.exists() or not profile_dir.is_dir():
+            print("Provided profile path is invalid.")
+            return
+    else:
+        profile_dir = find_default_release_profile()
+        if not profile_dir:
+            print("No default release profile found.")
+            return
 
     if args.password:
         if not decrypt_saved_logins(profile_dir, args.password):
@@ -195,7 +217,7 @@ def main():
     else:
         if not decrypt_saved_logins(profile_dir, ""):
             print("Decryption failed. This profile seems to require a primary password.")
-            print ("Use -p to provide one or -f to brute-force with a wordlist.")
+            print("Use -p to provide one or -f to brute-force with a wordlist.")
 
 
 # ========== Main Program ==========
